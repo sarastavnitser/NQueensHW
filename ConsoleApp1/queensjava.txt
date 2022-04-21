@@ -1,0 +1,255 @@
+package nqueens;
+public class NQueens
+{
+    private final static int MIN_SZ = 4;
+    private final static int MAX_SZ = 20;
+    private static int boardSize = MIN_SZ;
+    public static void main(String[] args)
+    {
+        Sedgewick(args);
+        MCON368(args);
+       
+    }
+ 
+ /******************************************************************************
+ *  Compilation:  javac Queens.java
+ *  Execution:    java Queens n
+ *
+ *  Solve the 8 queens problem using recursion and backtracking.
+ *  Prints out all solutions.
+ *
+ *  Limitations: works for n <= 25, but slows down considerably
+ *  for larger n.
+ *
+ *  Remark: this program implicitly enumerates all n^n possible
+ *  placements (instead of n!), but the backtracking prunes off
+ *  most of them, so it's not necessarily worth the extra
+ *  complication of enumerating only permutations.
+ *
+ *
+ *  % java Queens 3
+ *
+ *  % java Queens 4
+ *  * Q * *
+ *  * * * Q
+ *  Q * * *
+ *  * * Q *
+ *
+ *  * * Q *
+ *  Q * * *
+ *  * * * Q
+ *  * Q * *
+ *
+ *  % java Queens 8
+ *  Q * * * * * * *
+ *  * * * * Q * * *
+ *  * * * * * * * Q
+ *  * * * * * Q * *
+ *  * * Q * * * * *
+ *  * * * * * * Q *
+ *  * Q * * * * * *
+ *  * * * Q * * * *
+ *
+ *  ...
+ *
+ * Copyright © 2000–2017, Robert Sedgewick and Kevin Wayne.
+ * Last updated: Fri Oct 20 14:12:12 EDT 2017. 
+ ******************************************************************************/
+    private static void Sedgewick(String [] args)
+    {
+        System.out.println("Sedgewick:");
+         int n = Integer.parseInt(args[0]);
+        enumerate(n);
+    }
+ 
+        
+/***************************************************************************
+     * Return true if queen placement q[n] does not conflict with
+     * other queens q[0] through q[n-1]
+     ***************************************************************************/
+    public static boolean isConsistent(int[] q, int n)
+    {
+        for (int i = 0; i < n; i++)
+        {
+            if (q[i] == q[n]) return false;   // same column
+            if ((q[i] - q[n]) == (n - i)) return false;   // same major diagonal
+            if ((q[n] - q[i]) == (n - i)) return false;   // same minor diagonal
+        }
+        return true;
+    }
+    /***************************************************************************
+     * Prints n-by-n placement of queens from permutation q in ASCII.
+     ***************************************************************************/
+    public static void printQueens(int[] q)
+    {
+        int n = q.length;
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < n; j++)
+            {
+                if (q[i] == j) System.out.print("Q ");
+                else System.out.print("* ");
+            }
+            System.out.println();
+        }
+        System.out.println();
+    }
+    /***************************************************************************
+     *  Try all permutations using backtracking
+     ***************************************************************************/
+    public static void enumerate(int n)
+    {
+        int[] a = new int[n];
+        enumerate(a, 0);
+    }
+    public static void enumerate(int[] q, int k)
+    {
+        int n = q.length;
+        if (k == n) printQueens(q);
+        else
+        {
+            for (int i = 0; i < n; i++)
+            {
+                q[k] = i;
+                if (isConsistent(q, k)) enumerate(q, k + 1);
+            }
+        }
+    }
+    
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+    
+ /**
+ * ****************************************************************************<br>
+ * Compilation: javac Queens.java Execution: java Queens n <br>
+ * <br>
+ * Solve the 8 queens problem using recursion and backtracking. <br>
+ * Prints out all solutions.<br>
+ * <br>
+ * Limitations: works for n up to 25, but slows down considerably for larger
+ * n.<br>
+ * <br>
+ * Remark: this program implicitly enumerates all n^n possible placements
+ * (instead of n!), but the backtracking prunes off most of them, so it's not
+ * necessarily worth the extra complication of enumerating only permutations.
+ * <br>
+ * Placement of the queens is represented by queenColumns array of rows, <br>
+ * with each row containing an integer corresponding to the column <br>
+ * occupied by the queen in that row
+ * <br>
+ * based on Robert Sedgewick and Kevin Wayne.
+ * ****************************************************************************<br>
+ */
+    private static void MCON368(String [] args)
+    {
+        System.out.println("\n\n\nMCON");
+        setBoardSize(args);
+        int[] queenColumns = new int[boardSize];
+        printSolutionOrTryNextPosition(queenColumns, 0);
+    }
+    
+    private static void setBoardSize(String[] args)
+    {
+        int bsize = boardSize;
+        if (args.length > 0)
+        {
+            try
+            {
+                bsize = Integer.parseInt(args[0]);
+                if (bsize < MIN_SZ || bsize > MAX_SZ)
+                {
+                    boardSize = MIN_SZ;
+                }
+                else
+                {
+                    boardSize = bsize;
+                }
+            }
+            catch (Exception exc)
+            {
+                System.out.println(exc.getMessage() + "\nno valid size specified.  
+Using 4");
+            }
+        }
+    }
+    /**
+     * *************************************************************************
+     * Try all permutations using backtracking
+     * *************************************************************************
+     */
+    private static void printSolutionOrTryNextPosition(int[] queenColumns, int 
+thisRow)
+    {
+        if (thisRow == boardSize)
+        {
+            printSolution(queenColumns);
+        }
+        else
+        {
+            for (int col = 0; col < boardSize; ++col)
+            {
+                queenColumns[thisRow] = col;
+                if (thereAreNoCaptures(queenColumns, thisRow))
+                {
+                    printSolutionOrTryNextPosition(queenColumns, thisRow + 1);
+                }
+            }
+        }
+    }
+    /**
+     * *************************************************************************
+     * Return true if queen placement queens[row] does not conflict with other
+     * queens queens[0] through queens[n-1]
+     * *************************************************************************
+     */
+    private static boolean thereAreNoCaptures(int[] queens, int thisRow)
+    {
+        boolean noCaptures = true;
+        for (int row = 0; row < thisRow; ++row)
+        {
+            if (queens[row] == queens[thisRow])
+            {
+                noCaptures = false;   // same column
+                break;
+            }
+            int colGap = queens[thisRow] - queens[row];
+            int rowGap = thisRow - row;
+            if (colGap == -rowGap) // same major diagonal
+            {
+                noCaptures = false;   // capture along major diagonal
+                break;
+            }
+            if (colGap == rowGap) // same minor diagonal
+            {
+                noCaptures = false;   // capture along minor diagonal
+                break;
+            }
+        }
+        return noCaptures;
+    }
+    /**
+     * *************************************************************************
+     * Prints n-by-n placement of queens from permutation queens in ASCII.
+     * *************************************************************************
+     */
+    private static void printSolution(int[] queens)
+    {
+        int nrQueens = queens.length;
+        for (int row = 0; row < nrQueens; ++row)
+        {
+            for (int col = 0; col < nrQueens; ++col)
+            {
+                if (queens[row] == col)
+                {
+                    System.out.print("Q ");
+                }
+                else
+                {
+                    System.out.print("* ");
+                }
+            }
+            System.out.println();
+        }
+        System.out.println();
+    }
+}
